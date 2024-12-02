@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Forecast</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: white;
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        .btn-primary {
+            background-color: #6a11cb;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #2575fc;
+        }
+        .forecast {
+            list-style: none;
+            padding: 0;
+        }
+        .forecast li {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 10px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .spinner-container {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+        }
+        .spinner-border {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container text-center">
+        <h1 class="mb-4">Weekly Weather Forecast</h1>
+        <form id="forecastForm" action="/forecast" method="post" class="mb-4">
+            <div class="input-group">
+                <input type="text" class="form-control" name="city" placeholder="Enter city" required>
+                <button class="btn btn-primary" type="submit">Get Forecast</button>
+            </div>
+        </form>
+        <div class="spinner-container" id="loadingSpinner">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        <hr class="mb-4">
+        <% if (forecast) { %>
+            <h2 class="mb-3">Forecast for 7 Days:</h2>
+            <ul class="forecast">
+                <% forecast.forEach(day => { %>
+                    <li>
+                        <span><strong><%= day.date %></strong></span>
+                        <span><%= day.temp %>°C, <%= day.description %></span>
+                    </li>
+                <% }) %>
+            </ul>
+        <% } else if (error) { %>
+            <p class="text-danger"><%= error %></p>
+        <% } %>
+    </div>
+    <script>
+        const form = document.getElementById('forecastForm');
+        const spinner = document.getElementById('loadingSpinner');
+
+        form.addEventListener('submit', () => {
+            spinner.style.display = 'flex';
+        });
+    </script>
+</body>
+</html>
