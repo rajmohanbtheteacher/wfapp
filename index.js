@@ -5,6 +5,8 @@ const axios = require('axios');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const API_KEY = "cc0ec4f3436947d287153915252702"; // WeatherAPI.com API Key
+
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
@@ -15,10 +17,9 @@ app.get('/', (req, res) => {
     res.render('index', { forecast: null, error: null });
 });
 
-// Fetch Weather Data
+// Fetch Weather Data from WeatherAPI.com
 app.post('/forecast', async (req, res) => {
     const city = req.body.city;
-    const apiKey = 'fc7e573cde6d4908911f519c93c77a15'; // Replace with your Weatherbit API key
 
     if (!city || city.trim() === '') {
         res.render('index', { forecast: null, error: 'Please enter a valid city name.' });
@@ -26,24 +27,15 @@ app.post('/forecast', async (req, res) => {
     }
 
     try {
-        // Get city coordinates
-        const geoUrl = `https://api.weatherbit.io/v2.0/current?city=${encodeURIComponent(city)}&key=${apiKey}`;
-        const geoResponse = await axios.get(geoUrl);
+        // Get 7-day weather forecast
+        const forecastUrl = `http://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${encodeURIComponent(city)}&days=7&aqi=no&alerts=no`;
+        const response = await axios.get(forecastUrl);
 
-        if (geoResponse.data.count === 0) {
-            throw new Error('City not found');
-        }
-
-        const { lat, lon } = geoResponse.data.data[0];
-
-        // Get weather forecast using coordinates
-        const forecastUrl = `https://api.weatherbit.io/v2.0/forecast/daily?lat=${lat}&lon=${lon}&days=7&key=${apiKey}`;
-        const forecastResponse = await axios.get(forecastUrl);
-
-        const forecast = forecastResponse.data.data.map(day => ({
-            date: new Date(day.valid_date).toLocaleDateString(),
-            temp: day.temp,
-            description: day.weather.description,
+        const forecast = response.data.forecast.forecastday.map(day => ({
+            date: day.date,
+            temp: day.day.avgtemp_c,
+            condition: day.day.condition.text,
+            icon: day.day.condition.icon
         }));
 
         res.render('index', { forecast, error: null });
