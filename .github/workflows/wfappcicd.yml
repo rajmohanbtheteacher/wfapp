@@ -11,7 +11,7 @@ on:
 env:
   EC2_INSTANCE_IP: "44.198.175.103"  # Replace with EC2 Public IP to Just Test
   SSH_USER: "ubuntu"
-  CONTAINER_NAME: "weather-forecast-container"
+  CONTAINER_NAME: "wfapp-container"
   DOCKER_IMAGE_NAME: "weather-forecast-app"
 
 jobs:
