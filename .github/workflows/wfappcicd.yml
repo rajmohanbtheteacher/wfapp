@@ -1,4 +1,4 @@
-name: Deploy Linux Container - SonarQube Analysis
+name: Deploy Linux Containers - SonarQube Analysis
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
       - main
 
 env:
-  EC2_INSTANCE_IP: "44.198.175.103"  # Replace with EC2 Public/Private IP
+  EC2_INSTANCE_IP: "44.198.175.103"  # Replace with EC2 Public IP to Just Test
   SSH_USER: "ubuntu"
   CONTAINER_NAME: "weather-forecast-container"
   DOCKER_IMAGE_NAME: "weather-forecast-app"
