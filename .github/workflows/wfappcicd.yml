@@ -1,4 +1,4 @@
-name: Deploy Linux Container & SonarQube Analysis
+name: Deploy Linux Container - SonarQube Analysis
 
 on:
   push:
