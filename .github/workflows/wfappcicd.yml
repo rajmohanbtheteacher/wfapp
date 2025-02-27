@@ -1,0 +1,73 @@
+name: Deploy Linux Container & SonarQube Analysis
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  EC2_INSTANCE_IP: "44.198.175.103"  # Replace with EC2 Public/Private IP
+  SSH_USER: "ubuntu"
+  CONTAINER_NAME: "weather-forecast-container"
+  DOCKER_IMAGE_NAME: "weather-forecast-app"
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy to EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Build Docker Image
+        run: |
+          docker build -t $DOCKER_IMAGE_NAME .
+
+      - name: Save Docker Image as a TAR File
+        run: |
+          docker save -o $DOCKER_IMAGE_NAME.tar $DOCKER_IMAGE_NAME
+
+      - name: Copy Docker Image to EC2
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ env.EC2_INSTANCE_IP }}
+          username: ${{ env.SSH_USER }}
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          source: "${{ env.DOCKER_IMAGE_NAME }}.tar"
+          target: "/home/${{ env.SSH_USER }}/"
+
+      - name: SSH into EC2 and Deploy Container
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ env.EC2_INSTANCE_IP }}
+          username: ${{ env.SSH_USER }}
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          script: |
+            docker load -i /home/${{ env.SSH_USER }}/${{ env.DOCKER_IMAGE_NAME }}.tar
+            docker stop $CONTAINER_NAME || true
+            docker rm $CONTAINER_NAME || true
+            docker run -d -p 80:3000 --name $CONTAINER_NAME $DOCKER_IMAGE_NAME
+
+  sonar-analysis:
+    name: SonarQube Code Analysis
+    runs-on: ubuntu-latest
+    needs: build-and-deploy
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Run SonarQube Analysis
+        env:
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          docker run --rm --network host sonarsource/sonar-scanner-cli \
+            -Dsonar.projectKey=weather-forecast-app \
+            -Dsonar.sources=. \
+            -Dsonar.host.url=$SONAR_HOST_URL \
+            -Dsonar.login=$SONAR_TOKEN
