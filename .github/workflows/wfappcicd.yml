@@ -55,7 +55,7 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          docker run --rm --network host sonarsource/sonar-scanner-cli \
+          docker run --rm -v "$GITHUB_WORKSPACE:/home/ubuntu/wfapp/wfapp/actions-runner/_work/wfapp/wfapp" --network host sonarsource/sonar-scanner-cli \
             -Dsonar.projectKey=weather-forecast-app \
             -Dsonar.sources=. \
             -Dsonar.host.url="$SONAR_HOST_URL" \
