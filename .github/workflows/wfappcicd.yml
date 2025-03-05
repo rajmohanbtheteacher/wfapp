@@ -55,5 +55,6 @@ jobs:
           docker run --rm --network host sonarsource/sonar-scanner-cli \
             -Dsonar.projectKey=weather-forecast-apps \
             -Dsonar.sources=. \
+            -Dsonar.branch.name=main
             -Dsonar.host.url=$SONAR_HOST_URL \
             -Dsonar.login=$SONAR_TOKEN
