@@ -41,20 +41,22 @@ jobs:
       - name: Run New Docker Container
         run: |
           docker run -d -p 80:3000 --name $CONTAINER_NAME $DOCKER_IMAGE_NAME
-
+          
   sonar-analysis:
     name: SonarQube Code Analysis
-    runs-on: self-hosted  # Run on the EC2 instances
+    runs-on: self-hosted  # Run on the EC2 instance
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
       - name: Run SonarQube Analysis
+        env:
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           docker run --rm --network host sonarsource/sonar-scanner-cli \
             -Dsonar.projectKey=weather-forecast-app \
             -Dsonar.sources=. \
-            -Dsonar.branch.name=main
-            -Dsonar.host.url=$SONAR_HOST_URL \
-            -Dsonar.login=$SONAR_TOKEN
+            -Dsonar.host.url="$SONAR_HOST_URL" \
+            -Dsonar.login="$SONAR_TOKEN"
