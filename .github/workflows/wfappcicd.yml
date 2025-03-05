@@ -53,7 +53,7 @@ jobs:
       - name: Run SonarQube Analysis
         run: |
           docker run --rm --network host sonarsource/sonar-scanner-cli \
-            -Dsonar.projectKey=weather-forecast-apps \
+            -Dsonar.projectKey=weather-forecast-app \
             -Dsonar.sources=. \
             -Dsonar.branch.name=main
             -Dsonar.host.url=$SONAR_HOST_URL \
