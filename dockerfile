@@ -11,6 +11,6 @@ RUN npm install
 # Copy application files
 COPY . .
 
-# Expose port and run the weather forcast app
+# Expose port and run the weather forcast-app
 EXPOSE 3000
 CMD ["node", "index.js"]
